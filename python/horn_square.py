@@ -1,12 +1,13 @@
 from gradhorn import gradhorn
-import error_functions
+from horn import horn
+from middlebury import computeColor
 import matplotlib.pyplot as plt
 
 
 IM1_PATH = '../data/square/square9.png'
 IM2_PATH = '../data/square/square10.png'
 
-def debug_gradient(I1, I2, show=True):
+def debug_gradient(I1, I2, show=False):
     Ix, Iy, It = gradhorn(I1, I2)
     if show:
         plt.imshow(Ix, cmap='gray')
@@ -22,3 +23,8 @@ if __name__ == "__main__":
     I2 = plt.imread(IM2_PATH)
 
     debug_gradient(I1, I2)
+
+    u, v = horn(I1, I2, 0.0001, N=10_000)
+    computeColored = computeColor(u, v, True)
+    plt.imshow(computeColored)
+    plt.show()
