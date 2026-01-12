@@ -10,4 +10,9 @@ if __name__ == "__main__":
 
     window_sizes = [3,5,7,9,11,13,15,17]
 
-    run_lucas(I1, I2, window_sizes=window_sizes, plot=True, data_name='lucas_nasa')
+    print("Square window: ")
+    run_lucas(I1, I2, window_sizes=window_sizes, window_type='square', plot=True, data_name='lucas_nasa')
+    print("Gaussian window: ")
+    run_lucas(I1, I2, window_sizes=window_sizes, window_type='gaussian', plot=True, data_name='lucas_nasa_gaussian')
+    print("Circular window: ")
+    run_lucas(I1, I2, window_sizes=window_sizes, window_type='circular', plot=True, data_name='lucas_nasa_circular')

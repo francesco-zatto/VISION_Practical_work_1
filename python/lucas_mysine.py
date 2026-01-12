@@ -13,5 +13,10 @@ if __name__ == "__main__":
 
     window_sizes = [3,5,7,9,11]
 
+    print("Square window: ")
     run_lucas(I1, I2, GT=GT, window_sizes=window_sizes, window_type='square', plot=False, data_name='lucas_mysine')
+    print("Gaussian window: ")
+    run_lucas(I1, I2, GT=GT, window_sizes=window_sizes, window_type='gaussian', plot=False, data_name='lucas_mysine_gaussian')
+    print("Circular window: ")
+    run_lucas(I1, I2, GT=GT, window_sizes=window_sizes, window_type='circular', plot=False, data_name='lucas_mysine_circular')
     

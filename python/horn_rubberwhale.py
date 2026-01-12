@@ -21,4 +21,5 @@ if __name__ == "__main__":
     GT_v = GT[:, :, 1]
     utils.plot_flow_results(GT_u, GT_v, save_path=f'rubberwhale_gt.png')
 
+
     
