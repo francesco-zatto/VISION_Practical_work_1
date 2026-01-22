@@ -1,4 +1,5 @@
 import numpy as np
+import error_functions as err
 import utils
 from gradhorn import gradhorn
 from scipy.signal import convolve2d 
@@ -45,10 +46,10 @@ def compute_q(V, Ix, Iy, Ixx, Ixy, Iyy, delta):
     return q / denominator
 
 
-def nagel(I1, I2, N, alpha, delta):
+def nagel(I1, I2, N, alpha, delta=0.1):
     Ix, Iy, It = gradhorn(I1, I2)
     Ixx, Ixy, _ = gradhorn(Ix, Ix)
-    Iyy, _, _ = gradhorn(Iy, Iy)
+    _, Iyy, _ = gradhorn(Iy, Iy)
     u = v = np.zeros_like(Ix)
 
     V = compute_V(Ix, Iy, delta)
@@ -62,14 +63,36 @@ def nagel(I1, I2, N, alpha, delta):
         v = v_eta - Iy * update_term
     return u, v
 
-import matplotlib.pyplot as plt
+def run_alpha_search(I1, I2, GT, alphas, delta=0.1, N=1000, plot=False, compute_stats=True, data_name=''):
+    errors = []
+    stats = {} if GT is not None else None
+    optimal_alpha = None
+    for alpha in alphas:
+        u, v = nagel(I1, I2, N, alpha, delta)
+        w_e = np.stack((u, v), axis=2)
+        if GT is not None:
+            mean, _ = err.angular_error(GT, w_e)
+            print(f'Alpha: {alpha}, Error: {mean:.5f}')
+        else:
+            print(f'Alpha: {alpha}')
+        if plot:
+            utils.plot_flow_results(u, v, save_path=f'plot_nagel/{data_name}_{alpha}.png')
+        if GT is not None and compute_stats:
+            stats.update(utils.get_stats(GT, w_e, alpha))
+            errors.append(mean)
+    if GT is not None:
+        optimal_alpha = alphas[np.argmin(errors)]
+        print(f'Optimal alpha: {optimal_alpha} with angular error: {min(errors):.5f}')
+    return optimal_alpha, stats
 
-IM1_PATH = 'data/taxi/taxi9.png'
-IM2_PATH = 'data/taxi/taxi10.png'
+def run_nagel(I1, I2, GT=None, delta=0.1, alphas=None, N=1000, plot=False, data_name=''):
+    if alphas is None:
+        alphas = 10.0 ** np.linspace(-4, 1, 6)
 
-if __name__ == "__main__":
-    I1 = plt.imread(IM1_PATH)
-    I2 = plt.imread(IM2_PATH)
+    optimal_alpha, stats = run_alpha_search(I1, I2, GT, alphas, delta, N=N, plot=plot, compute_stats=True, data_name=data_name)
 
-    u, v = nagel(I1, I2, N=1000, alpha=0.01, delta=0.1)
-    utils.plot_flow_results(u, v, save_path='taxi_nagel.png')
+    if optimal_alpha:
+        u, v = nagel(I1, I2, N, optimal_alpha, delta)
+        utils.plot_flow_results(u, v, save_path=f'plot_nagel/{data_name}_{optimal_alpha}.png')
+    if stats:
+        utils.print_stats(stats)  

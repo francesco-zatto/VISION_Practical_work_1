@@ -16,9 +16,9 @@ def plot_flow_results(u, v, step=10, save_path='result.png'):
                u[::step, ::step], v[::step, ::step], 
                color='red', angles='xy')
     plt.gca().invert_yaxis()
-    plt.savefig('../plot/' + save_path)
+    plt.savefig(save_path)
 
-    # plt.show()
+    plt.show()
 
 def get_stats(w_r, w_e, alpha):  
     epe_m, epe_s = err.end_point_error(w_r, w_e)
