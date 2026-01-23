@@ -21,10 +21,9 @@ def warp_image(I, u, v):
     row_coords, col_coords = np.meshgrid(np.arange(nr), np.arange(nc), indexing='ij')
     return warp(I, np.array([row_coords + v, col_coords + u]))
 
-def run_multires(I1: np.ndarray, I2: np.ndarray):
-    K = np.floor(np.log2(min(I1.shape[0], I1.shape[1]))) - 1
+def run_multires(I1: np.ndarray, I2: np.ndarray, W: int = 3):
+    K = int(np.ceil(np.log2(min(I1.shape[0], I1.shape[1]))))
     sigma = 2
-    W = 3
 
     print(K)
     
@@ -42,6 +41,7 @@ def run_multires(I1: np.ndarray, I2: np.ndarray):
         I1_Ks.append(I1)
         I2_Ks.append(I2)
 
+    print([I.shape for I in I1_Ks])
     u = np.zeros_like(I1_Ks[-1])
     v = np.zeros_like(I1_Ks[-1])
 
@@ -51,8 +51,8 @@ def run_multires(I1: np.ndarray, I2: np.ndarray):
         I1 = I1_Ks[n]
         I2 = I2_Ks[n]
 
-        u = resize(u, I1.shape, order=1, anti_aliasing=False)
-        v = resize(v, I1.shape, order=1, anti_aliasing=False)
+        u = resize(u, I1.shape, order=1, anti_aliasing=False) * 2
+        v = resize(v, I1.shape, order=1, anti_aliasing=False) * 2
 
         I2_shifted = warp_image(I2, u, v)
 
